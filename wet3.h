@@ -15,6 +15,7 @@ void* __realloc(void* ptr, size_t size);
 =============================================================================*/
 #include <unistd.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 /*=============================================================================
 * defines
@@ -25,17 +26,17 @@ void* __realloc(void* ptr, size_t size);
 /*=============================================================================
 * Block
 =============================================================================*/
-typedef struct
+typedef struct Block
 {
     size_t size;
-    Block* next;
+    struct Block* next;
     bool free;
 } Block;
-Block* blockList = NULL;
+extern Block* blockList;
 
 Block* requestSpace(size_t size);
 Block* findFreeBlock(size_t size);
-void mergeBlocks();
+void mergeBlocks(void);
 
 
 #endif // __WET3__

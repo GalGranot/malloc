@@ -2,6 +2,7 @@
 * includes
 =============================================================================*/
 #include "wet3.h"
+Block* blockList;
 
 #define dbg 1
 
@@ -18,10 +19,11 @@ void initBlock(Block* block, size_t size)
 Block* requestSpace(size_t size)
 {
     Block* block;
-    void* curr_program_break = sbrk(0);
+    void* programBreak = sbrk(0);
     if(sbrk(size + sizeof(Block)) == SBRK_FAIL)
         return NULL;
     if(dbg) printf("<requestSpace>: allocated %d bytes\n", size);
+    block = (Block*)programBreak;
     initBlock(block, size);
     return block;
 }
@@ -71,11 +73,11 @@ void* __malloc(size_t size)
         return NULL;
     }
     size_t alignedSize = ALIGN_TO_8BIT(size);
-    Block* block = findFreeBlock();
+    Block* block = findFreeBlock(alignedSize);
     if(block)
     {
         if(dbg) printf("<malloc>: allocated free block\n");
-        block->Free = false;
+        block->free = false;
         return (block + 1);
     }
     if(dbg) printf("<malloc>: couldn't find free block, requesting space\n");
@@ -89,7 +91,7 @@ void* __malloc(size_t size)
     {
         Block* currentBlock = blockList;
         while(currentBlock)
-            currentBlock = curr_block->next;
+            currentBlock = currentBlock->next;
         currentBlock->next = block;
     }
     return (block + 1);
