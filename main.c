@@ -1,11 +1,13 @@
-#include "wet3.h"
+#include "customAllocator.h"
 
 int main()
 {
-    printf("starting\n");
-    int* x = (int*)__malloc(sizeof(int));
-    *x = 0;
-    printf("%d\n", *x);
-    __free(x);
-    return 0;
+    for(int i = 1; i < 1024; i++)
+    {
+        void* ptr = customMalloc(i);
+        customFree(ptr);
+        ptr = customCalloc(2, i);;
+        customRealloc(ptr, i * 4);
+        customFree(ptr);
+    }
 }
